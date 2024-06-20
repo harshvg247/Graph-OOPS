@@ -27,6 +27,8 @@ public:
     virtual void display();
     virtual vector<int> bfs(int vertex);
     virtual vector<int> dfs(int vertex);
+    // FOR YOU----> // used call by reference, for just using the address, instead of unnecessary copying 
+    virtual void explore(int vertex, vector<int>& visited, vector<int>& ans);
     // this way only DerictedGraph class can access adjList
     friend class DirectedGraph;
 };
@@ -82,8 +84,29 @@ vector<int> Graph::bfs(int vertex)
     }
     return ans;
 }
-vector<int> Graph::dfs(int vertex){
-
+void Graph::explore(int vertex, vector<int>& visited, vector<int>& ans)
+{
+    visited[vertex] = 1;
+    ans.push_back(vertex);
+    for (auto neighbour : adjList[vertex])
+    {
+        if (!visited[neighbour])
+        {
+            explore(neighbour, visited, ans);
+        }
+    }
+}
+vector<int> Graph::dfs(int vertex)
+{
+    vector <int> ans;
+    vector <int> visited(numVertices, 0);
+    visited[vertex] = 1;
+    ans.push_back(vertex);
+    for (auto neighbour : adjList[vertex]) 
+    {
+        explore(neighbour, visited, ans);
+    }
+    return ans;
 }
 class DirectedGraph : public Graph
 {
