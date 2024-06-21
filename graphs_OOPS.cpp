@@ -40,7 +40,20 @@ public:
     virtual int ShortestPath(int start, int destination);
     // this way only DerictedGraph class can access adjList
     friend class DirectedGraph;
+    friend ostream & operator << (ostream &out, const Graph &graph);
 };
+
+ostream & operator << (ostream &out, const Graph &graph)
+{
+    for (int node = 0; node < graph.numNodes; node++){
+        out << node << " -> ";
+        for(auto neighbour : graph.adjList[node]){
+            out << neighbour << " ";
+        }
+        out << endl;
+    }
+    return out;
+}
 // Graph::Graph(int nodes): This is the constructor for the Graph class, which takes an integer argument vertices to specify the number of nodes in the graph.
 // : numNodes(nodes): This is a member initialization list, which initializes the numNodes attribute with the value of the vertices argument.
 Graph::Graph(int nodes) : numNodes(nodes)
@@ -265,9 +278,23 @@ public:
     virtual void addEdge(int v, int w, int weight);
     virtual void removeEdge(int v, int w);
     virtual int ShortestPath(int start, int target);
+
     // display has same number of arguments so no need to define it to be virtual here(as already done in Graph class)
     void display();
+    friend ostream & operator << (ostream &out, const WeightedGraph &graph);
 };
+
+ostream & operator << (ostream &out, const WeightedGraph &graph){
+    for (int node = 0; node < graph.numNodes; node++){
+        out << node << " -> ";
+        for(auto neighbour : graph.adjList[node]){
+            out << neighbour.first << " " << neighbour.second << "  ";
+        }
+        out << endl;
+    }
+    return out;
+}
+
 WeightedGraph::WeightedGraph(int nodes) : Graph(nodes)
 {
     // since adjList of this class is different from Graph class, we need to resize it here
@@ -383,21 +410,22 @@ void WeightedDirectedGraph::removeEdge(int v, int w)
 
 int main()
 {
-    Graph g(8);
-    g.addEdge(0, 1);
-    g.addEdge(0, 2);
-    g.addEdge(0, 3);
-    g.addEdge(2, 3);
+    WeightedDirectedGraph g(8);
+    g.addEdge(0, 1, 1);
+    g.addEdge(0, 2, 1);
+    g.addEdge(0, 3, 1);
+    g.addEdge(2, 3, 1);
 
-    g.addEdge(4, 5);
-    g.addEdge(5, 7);
-    g.addEdge(4, 6);
-    g.addEdge(6, 7);
-    g.addEdge(3, 4);
+    g.addEdge(4, 5, 1);
+    g.addEdge(5, 7, 1);
+    g.addEdge(4, 6, 1);
+    g.addEdge(6, 7, 1);
+    g.addEdge(3, 4, 1);
     cout << "Number of Connected Components:" << g.numConnectedComponents() << '\n';
     cout << "Shortest Path:" << g.ShortestPath(1,7) << '\n';
     // bool ans = g.isCyclic();
     // cout << ans << endl;
+    cout << g;
     g.display();
     return 0;
 }
