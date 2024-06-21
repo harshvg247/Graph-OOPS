@@ -222,19 +222,19 @@ void WeightedGraph::addEdge(int v, int w, int weight)
 }
 void WeightedGraph::removeEdge(int v, int w)
 {
-    for (auto neighbour : adjList[v])
+    for (auto itr = adjList[v].begin(); itr != adjList[v].end(); itr++)
     {
-        if (neighbour.first == w)
+        if (itr->first == w)
         {
-            adjList[v].erase(find(adjList[v].begin(), adjList[v].end(), neighbour));
+            adjList[v].erase(itr);
             break;
         }
     }
-    for (auto neighbour : adjList[w])
+    for (auto itr = adjList[w].begin(); itr != adjList[w].end(); itr++)
     {
-        if (neighbour.first == v)
+        if (itr->first == v)
         {
-            adjList[w].erase(find(adjList[w].begin(), adjList[w].end(), neighbour));
+            adjList[w].erase(itr);
             break;
         }
     }
@@ -266,11 +266,11 @@ void WeightedDirectedGraph::addEdge(int v, int w, int weight)
 }
 void WeightedDirectedGraph::removeEdge(int v, int w)
 {
-    for (auto neighbour : adjList[v])
+    for (auto itr = adjList[v].begin(); itr != adjList[v].end(); itr++)
     {
-        if (neighbour.first == w)
+        if (itr->first == w)
         {
-            adjList[v].erase(find(adjList[v].begin(), adjList[v].end(), neighbour));
+            adjList[v].erase(itr);
             break;
         }
     }
