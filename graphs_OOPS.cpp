@@ -35,7 +35,7 @@ public:
     // FOR YOU----> // used call by reference, for just using the address, instead of unnecessary copying
     virtual void explore(int node, vector<int> &visited, vector<int> &ans);
 
-    virtual bool isCyclic();
+    bool isCyclic();
     int numConnectedComponents();
     virtual int ShortestPath(int start, int destination);
     // this way only DerictedGraph class can access adjList
