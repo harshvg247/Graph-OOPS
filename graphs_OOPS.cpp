@@ -23,7 +23,7 @@ protected:
     virtual void numConnectedComponentsHelper(int node, vector<int> &visited);
 
 public:
-    Graph(int vertices); // constructor
+    Graph(int nodes); // constructor
     virtual ~Graph() {}
     virtual void addEdge(int v, int w);
     virtual void removeEdge(int v, int w);
@@ -41,8 +41,8 @@ public:
     // this way only DerictedGraph class can access adjList
     friend class DirectedGraph;
 };
-// Graph::Graph(int vertices): This is the constructor for the Graph class, which takes an integer argument vertices to specify the number of vertices in the graph.
-// : numNodes(vertices): This is a member initialization list, which initializes the numNodes attribute with the value of the vertices argument.
+// Graph::Graph(int nodes): This is the constructor for the Graph class, which takes an integer argument vertices to specify the number of nodes in the graph.
+// : numNodes(nodes): This is a member initialization list, which initializes the numNodes attribute with the value of the vertices argument.
 Graph::Graph(int nodes) : numNodes(nodes)
 {
     // Resizes the adjacency list to accommodate the specified number of vertices
@@ -93,11 +93,11 @@ vector<int> Graph::bfs(int vertex)
     }
     return ans;
 }
-void Graph::explore(int vertex, vector<int> &visited, vector<int> &ans)
+void Graph::explore(int node, vector<int> &visited, vector<int> &ans)
 {
-    visited[vertex] = 1;
-    ans.push_back(vertex);
-    for (auto neighbour : adjList[vertex])
+    visited[node] = 1;
+    ans.push_back(node);
+    for (auto neighbour : adjList[node])
     {
         if (!visited[neighbour])
         {
@@ -105,13 +105,13 @@ void Graph::explore(int vertex, vector<int> &visited, vector<int> &ans)
         }
     }
 }
-vector<int> Graph::dfs(int vertex)
+vector<int> Graph::dfs(int node)
 {
     vector<int> ans;
     vector<int> visited(numNodes, 0);
-    visited[vertex] = 1;
-    ans.push_back(vertex);
-    for (auto neighbour : adjList[vertex])
+    visited[node] = 1;
+    ans.push_back(node);
+    for (auto neighbour : adjList[node])
     {
         explore(neighbour, visited, ans);
     }
@@ -175,7 +175,7 @@ int Graph::ShortestPath(int start, int destination)
     // FOR YOU---> // this array is used to store the minimum distance from start to any node encountered during the loop
     vector<int> dp(numNodes, 1e9);
     dp[start] = 0;
-    priority_queue <pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> q;
+    priority_queue <pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> q;
     q.push(make_pair(0, start));
     while(!q.empty())
     {
