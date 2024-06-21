@@ -15,12 +15,12 @@ class Graph
 private:
     // making this private so only friend class i.e. DirectedGraph can access it
     vector<vector<int>> adjList;
+    void numConnectedComponentsHelper(int node, vector<int> &visited);
+    bool isCyclicHelper(int node, vector<int> &visited, int parent);
 
 protected:
     //  making this protected as numNodes will be common for all graph types
     int numNodes;
-    virtual bool isCyclicHelper(int node, vector<int> &visited, int parent);
-    virtual void numConnectedComponentsHelper(int node, vector<int> &visited);
 
 public:
     Graph(int nodes); // constructor
@@ -161,11 +161,13 @@ bool Graph::isCyclic()
 void Graph::numConnectedComponentsHelper(int node, vector<int> &visited)
 {
     visited[node] = 1;
+    cout << node << '\n';
     for (auto neighbour : adjList[node])
     {
         if (!visited[neighbour])
         {
-            numConnectedComponentsHelper(neighbour, visited);
+            // cout << neighbour << '\n';
+            this->numConnectedComponentsHelper(neighbour, visited);
         }
     }
 }
@@ -177,7 +179,7 @@ int Graph::numConnectedComponents()
     {
         if (!visited[node])
         {
-            numConnectedComponentsHelper(node, visited);
+            this->numConnectedComponentsHelper(node, visited);
             result++;
         }
     }
@@ -268,8 +270,8 @@ class WeightedGraph : public Graph
     // protected so that WeightedDirectedGraph class can access it
 protected:
     vector<vector<pair<int, int>>> adjList;
-    virtual void numConnectedComponenetsHelper(int node, vector<int> &visited);
-    virtual bool isCyclicHelper(int node, vector<int> & visited, int parent);
+    void numConnectedComponenetsHelper(int node, vector<int> &visited);
+    bool isCyclicHelper(int node, vector<int> & visited, int parent);
 
 public:
     WeightedGraph(int nodes);
@@ -277,7 +279,9 @@ public:
     // so we need to again define it to be virtual here(for appropriate binding behaviour in this class and WeightedDirectedGraph class)
     virtual void addEdge(int v, int w, int weight);
     virtual void removeEdge(int v, int w);
+    int numConnectedComponents();
     virtual int ShortestPath(int start, int target);
+    vector<pair<int,int>> MinimumSpanningTree();
 
     // display has same number of arguments so no need to define it to be virtual here(as already done in Graph class)
     void display();
@@ -331,16 +335,30 @@ void WeightedGraph::numConnectedComponenetsHelper(int node, vector<int> & visite
     {
         if (!visited[neighbour.first])
         {
-            numConnectedComponenetsHelper(neighbour.first, visited);
+            WeightedGraph::numConnectedComponenetsHelper(neighbour.first, visited);
         }
     }
+}
+int WeightedGraph::numConnectedComponents()
+{
+    vector<int> visited(numNodes, 0);
+    int result = 0;
+    for (int node = 0; node < numNodes; node++)
+    {
+        if (!visited[node])
+        {
+            WeightedGraph::numConnectedComponenetsHelper(node, visited);
+            result++;
+        }
+    }
+    return result;
 }
 bool WeightedGraph::isCyclicHelper(int node, vector<int> & visited, int parent)
 {
     visited[node] = 1;
     for(auto neighbour : adjList[node]){
         if(!visited[neighbour.first]){
-            if(isCyclicHelper(neighbour.first, visited, node)){
+            if(WeightedGraph::isCyclicHelper(neighbour.first, visited, node)){
                 return true;
             }
         }else if(neighbour.first != parent){
@@ -370,6 +388,38 @@ int WeightedGraph::ShortestPath(int start, int destination)
         }
     }
     return dp[destination];
+}
+vector<pair<int,int>> WeightedGraph::MinimumSpanningTree()
+{
+    vector<int> included(numNodes, 0);
+    // stores the minimum edge weight through which the any node was encountered
+    vector<int> dp(numNodes, 1e9);
+    dp[0] = 0;
+    vector<int> parent(numNodes);
+    parent[0] = 0;
+    priority_queue <pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> q;
+    q.push(make_pair(0, 0));
+    while(!q.empty())
+    {
+        auto [distance , node] = q.top();
+        q.pop();
+        if (included[node] == 1) continue;
+        included[node] = 1;
+        for (auto neighbour : adjList[node])
+        {
+            if (!included[neighbour.first] && dp[neighbour.first] > neighbour.second) {
+                dp[neighbour.first] = neighbour.second;
+                parent[neighbour.first] = node;
+                q.push(make_pair(dp[neighbour.first], neighbour.first));
+            }
+        }
+    }
+    vector<pair<int,int>> ans;
+    for (int node = 1; node < numNodes; node++)
+    {
+        ans.push_back(make_pair(node, parent[node]));
+    }
+    return ans;
 }
 void WeightedGraph::display()
 {
@@ -410,7 +460,7 @@ void WeightedDirectedGraph::removeEdge(int v, int w)
 
 int main()
 {
-    WeightedDirectedGraph g(8);
+    WeightedGraph g(8);
     g.addEdge(0, 1, 1);
     g.addEdge(0, 2, 1);
     g.addEdge(0, 3, 1);
@@ -423,9 +473,14 @@ int main()
     g.addEdge(3, 4, 1);
     cout << "Number of Connected Components:" << g.numConnectedComponents() << '\n';
     cout << "Shortest Path:" << g.ShortestPath(1,7) << '\n';
+
+    vector<pair<int,int>> res = g.MinimumSpanningTree();
+    for (int i=0;i<res.size();i++){
+        cout << "Edge " << i+1 << ": " << res[i].first << ' ' << res[i].second << '\n';
+    }
     // bool ans = g.isCyclic();
     // cout << ans << endl;
-    cout << g;
-    g.display();
+    // cout << g;
+    // g.display();
     return 0;
 }
