@@ -161,13 +161,11 @@ bool Graph::isCyclic()
 void Graph::numConnectedComponentsHelper(int node, vector<int> &visited)
 {
     visited[node] = 1;
-    cout << node << '\n';
     for (auto neighbour : adjList[node])
     {
         if (!visited[neighbour])
         {
-            // cout << neighbour << '\n';
-            this->numConnectedComponentsHelper(neighbour, visited);
+            numConnectedComponentsHelper(neighbour, visited);
         }
     }
 }
@@ -179,7 +177,7 @@ int Graph::numConnectedComponents()
     {
         if (!visited[node])
         {
-            this->numConnectedComponentsHelper(node, visited);
+            numConnectedComponentsHelper(node, visited);
             result++;
         }
     }
