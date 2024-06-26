@@ -33,7 +33,7 @@ public:
     virtual vector<int> dfs(int node);
 
     // FOR YOU----> // used call by reference, for just using the address, instead of unnecessary copying
-    virtual void explore(int node, vector<int> &visited, vector<int> &ans);
+    virtual void dfsHelper(int node, vector<int> &visited, vector<int> &ans);
 
     bool isCyclic();
     int numConnectedComponents();
@@ -106,7 +106,7 @@ vector<int> Graph::bfs(int vertex)
     }
     return ans;
 }
-void Graph::explore(int node, vector<int> &visited, vector<int> &ans)
+void Graph::dfsHelper(int node, vector<int> &visited, vector<int> &ans)
 {
     visited[node] = 1;
     ans.push_back(node);
@@ -114,7 +114,7 @@ void Graph::explore(int node, vector<int> &visited, vector<int> &ans)
     {
         if (!visited[neighbour])
         {
-            explore(neighbour, visited, ans);
+            dfsHelper(neighbour, visited, ans);
         }
     }
 }
@@ -126,7 +126,7 @@ vector<int> Graph::dfs(int node)
     ans.push_back(node);
     for (auto neighbour : adjList[node])
     {
-        explore(neighbour, visited, ans);
+        dfsHelper(neighbour, visited, ans);
     }
     return ans;
 }
@@ -277,6 +277,10 @@ public:
     // so we need to again define it to be virtual here(for appropriate binding behaviour in this class and WeightedDirectedGraph class)
     virtual void addEdge(int v, int w, int weight);
     virtual void removeEdge(int v, int w);
+    vector<int> bfs(int node);
+    vector<int> dfs(int node);
+    void dfsHelper(int node, vector<int> &visited, vector<int> &ans);
+
     int numConnectedComponents();
     virtual int ShortestPath(int start, int target);
     vector<pair<int,int>> MinimumSpanningTree();
@@ -285,6 +289,56 @@ public:
     void display();
     friend ostream & operator << (ostream &out, const WeightedGraph &graph);
 };
+
+vector<int> WeightedGraph::bfs(int vertex)
+{
+    vector<int> ans;
+    queue<int> q;
+    q.push(vertex);
+    vector<int> visited(numNodes, 0);
+    visited[vertex] = 1;
+    while (!q.empty())
+    {
+        int node = q.front();
+        q.pop();
+        ans.push_back(node);
+        for (auto neighbour : adjList[node])
+        {
+            if (!visited[neighbour.first])
+            {
+                visited[neighbour.first] = 1;
+                q.push(neighbour.first);
+            }
+        }
+    }
+    return ans;
+}
+
+void WeightedGraph::dfsHelper(int node, vector<int> &visited, vector<int> &ans)
+{
+    visited[node] = 1;
+    ans.push_back(node);
+    for (auto neighbour : adjList[node])
+    {
+        if (!visited[neighbour.first])
+        {
+            dfsHelper(neighbour.first, visited, ans);
+        }
+    }
+}
+
+vector<int> WeightedGraph::dfs(int node)
+{
+    vector<int> ans;
+    vector<int> visited(numNodes, 0);
+    visited[node] = 1;
+    ans.push_back(node);
+    for (auto neighbour : adjList[node])
+    {
+        dfsHelper(neighbour.first, visited, ans);
+    }
+    return ans;
+}
 
 ostream & operator << (ostream &out, const WeightedGraph &graph){
     for (int node = 0; node < graph.numNodes; node++){
@@ -463,22 +517,14 @@ int main()
     g.addEdge(0, 2, 1);
     g.addEdge(0, 3, 1);
     g.addEdge(2, 3, 1);
-
     g.addEdge(4, 5, 1);
     g.addEdge(5, 7, 1);
     g.addEdge(4, 6, 1);
     g.addEdge(6, 7, 1);
     g.addEdge(3, 4, 1);
-    cout << "Number of Connected Components:" << g.numConnectedComponents() << '\n';
-    cout << "Shortest Path:" << g.ShortestPath(1,7) << '\n';
-
-    vector<pair<int,int>> res = g.MinimumSpanningTree();
-    for (int i=0;i<res.size();i++){
-        cout << "Edge " << i+1 << ": " << res[i].first << ' ' << res[i].second << '\n';
-    }
-    // bool ans = g.isCyclic();
-    // cout << ans << endl;
-    // cout << g;
-    // g.display();
+    
+    vector<int> ans = g.bfs(0);
+    
+    printVector(ans);
     return 0;
 }
