@@ -205,6 +205,8 @@ int Graph::ShortestPath(int start, int destination)
             }
         }
     }
+    // -1 for not reachable from start to destination
+    if (dp[destination] == 1e9) return -1;
     return dp[destination];
 }
 class DirectedGraph : public Graph
@@ -439,6 +441,8 @@ int WeightedGraph::ShortestPath(int start, int destination)
             }
         }
     }
+    // return -1 for not reachable from start to destination
+    if (dp[destination] == 1e9) return -1;
     return dp[destination];
 }
 vector<pair<int,int>> WeightedGraph::MinimumSpanningTree()
