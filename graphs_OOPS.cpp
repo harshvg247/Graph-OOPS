@@ -211,6 +211,8 @@ int Graph::ShortestPath(int start, int destination)
 }
 class DirectedGraph : public Graph
 {
+private:
+    bool isCyclicHelper(int node, vector<int>& visited);
 public:
     DirectedGraph(int nodes);
     void addEdge(int v, int w);
@@ -218,6 +220,7 @@ public:
     // display function of Graph class will be used
     // topological sort using Kahn algorithm
     virtual vector<int> topoSort();
+    bool isCyclic();
 };
 DirectedGraph::DirectedGraph(int nodes) : Graph(nodes) {}
 void DirectedGraph::addEdge(int v, int w)
@@ -263,6 +266,35 @@ vector<int> DirectedGraph::topoSort()
         }
     }
     return ans;
+}
+bool DirectedGraph::isCyclicHelper(int node, vector<int>& visited)
+{
+    visited[node] = 1;
+    for (auto neighbour : adjList[node]){
+        if(!visited[neighbour]){
+            if(isCyclicHelper(neighbour, visited)){
+                return true;
+            }
+        }else if (visited[neighbour] == 1){
+            return true;
+        }
+    }
+    visited[node] = 2;
+    return false;
+}
+bool DirectedGraph::isCyclic()
+{
+    vector<int> visited(numNodes, 0);
+    for(int node = 0; node < numNodes; node++){
+        if (!visited[node])
+        {
+            if(isCyclicHelper(node, visited)==true)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 class WeightedGraph : public Graph
@@ -527,8 +559,12 @@ int main()
     g.addEdge(6, 7, 1);
     g.addEdge(3, 4, 1);
     
-    vector<int> ans = g.bfs(0);
+    cout << "Graph :\n";
+    cout << g;
+
+    cout << '\n';
+    cout << "Number of Connected Components: ";
+    cout << g.numConnectedComponents();
     
-    printVector(ans);
     return 0;
 }
